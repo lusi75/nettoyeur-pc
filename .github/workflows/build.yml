@@ -1,0 +1,70 @@
+name: Compiler Nettoyeur PC
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  build:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Outils iPhone (libimobiledevice via MSYS2)
+        uses: msys2/setup-msys2@v2
+        with:
+          msystem: UCRT64
+          update: true
+          install: >-
+            mingw-w64-ucrt-x86_64-libimobiledevice
+            mingw-w64-ucrt-x86_64-ideviceinstaller
+            zip
+      - name: Rassembler les outils iPhone
+        shell: msys2 {0}
+        run: |
+          set +e +o pipefail
+          mkdir -p tools
+          for t in ideviceinfo idevicecrashreport idevicebackup2 idevice_id idevicediagnostics idevicepair idevicesyslog ideviceinstaller; do
+            cp /ucrt64/bin/$t.exe tools/
+          done
+          for i in 1 2 3; do
+            for f in tools/*.exe tools/*.dll; do
+              [ -f "$f" ] || continue
+              ldd "$f" | awk '{print $3}' | grep -i '^/ucrt64/' | while read d; do cp -n "$d" tools/ 2>/dev/null; done
+            done
+          done
+          pacman -Q | grep -i -E "imobiledevice|usbmuxd|plist" > tools/VERSIONS.txt
+          cd tools && zip -q -9 ../Assets/outils-iphone.zip * && cd ..
+          test -f Assets/outils-iphone.zip
+
+      - name: Outils Android (Platform-Tools de Google)
+        shell: pwsh
+        run: |
+          Invoke-WebRequest https://dl.google.com/android/repository/platform-tools-latest-windows.zip -OutFile pt.zip
+          Expand-Archive pt.zip -DestinationPath pt
+          Compress-Archive -Path pt/platform-tools/adb.exe, pt/platform-tools/AdbWinApi.dll, pt/platform-tools/AdbWinUsbApi.dll -DestinationPath Assets/outils-android.zip
+
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '9.0.x'
+
+      - name: Compilation
+        shell: pwsh
+        run: dotnet publish -c Release -r win-x64 --self-contained true -p:PublishSingleFile=true -p:IncludeNativeLibrariesForSelfExtract=true -p:EnableCompressionInSingleFile=true -p:DebugType=none -o publish
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: NettoyeurPC
+          path: publish/NettoyeurPC.exe
+
+      - name: Publier la version
+        shell: pwsh
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          $v = ([xml](Get-Content NettoyeurPC.csproj)).Project.PropertyGroup.Version | Where-Object { $_ } | Select-Object -First 1
+          $tag = "v$v"
+          gh release view $tag 2>$null
+          if ($LASTEXITCODE -eq 0) { gh release upload $tag publish/NettoyeurPC.exe --clobber }
+          else { gh release create $tag publish/NettoyeurPC.exe --title "Nettoyeur PC $v" --notes "Télécharge NettoyeurPC.exe ci-dessous et lance-le (voir le README)." --target $env:GITHUB_SHA }

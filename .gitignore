@@ -1,0 +1,8 @@
+bin/
+obj/
+publish/
+*.user
+.vs/
+# Outils téléphone : préparés par la compilation automatique (voir README)
+Assets/outils-iphone.zip
+Assets/outils-android.zip

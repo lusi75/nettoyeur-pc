@@ -33,7 +33,7 @@ public class IPhonePage : UserControl
             if (ids.Count == 0)
             {
                 _sub.Text = "Aucun iPhone détecté.";
-                Message("Branche ton iPhone en USB, déverrouille-le et appuie sur « Se fier » s'il le demande, puis clique sur Actualiser.\n\nSi rien ne change : iTunes (version du site d'Apple) doit être installé, il fournit le service qui fait le lien avec l'iPhone.");
+                NoDevice();
                 return;
             }
             _dev = await Task.Run(() => IPhone.Info(ids[0]));
@@ -43,6 +43,32 @@ public class IPhonePage : UserControl
         }
         catch (Exception ex) { Log.Error("Écran iPhone", ex); Message("Erreur : " + ex.Message); }
         finally { _loading = false; }
+    }
+
+    void NoDevice()
+    {
+        _body.Children.Clear();
+        var sp = new StackPanel();
+        sp.Children.Add(Wrap("Branche ton iPhone en USB, déverrouille-le et appuie sur « Se fier » s'il le demande, puis clique sur Actualiser (en haut à droite).", "Body"));
+        sp.Children.Add(Ui.Text("Toujours rien ?", "H3").With(t => t.Margin = new Thickness(0, 18, 0, 6)));
+        sp.Children.Add(Wrap("1.  iTunes doit être installé depuis le site d'Apple (pas la version du Microsoft Store) : il fournit le service qui fait le lien avec l'iPhone.", "Small", 13));
+        var itunes = Ui.Btn("Télécharger iTunes (site d'Apple)", "Ghost", (_, _) => Shell.OpenUrlOrFile("https://www.apple.com/itunes/download/win64"), "\uE896");
+        itunes.Height = 36; itunes.HorizontalAlignment = HorizontalAlignment.Left; itunes.Margin = new Thickness(0, 8, 0, 14);
+        sp.Children.Add(itunes);
+        sp.Children.Add(Wrap("2.  Si l'iPhone apparaît dans Windows comme « Périphérique USB MTP », il manque le pilote USB d'Apple. L'appli peut le télécharger chez Microsoft et l'installer pour toi.", "Small", 13));
+        var res = Wrap("", "Small", 13);
+        var drv = Ui.Btn("Installer le pilote USB d'Apple", "Primary", null, "\uE896");
+        drv.Height = 38; drv.HorizontalAlignment = HorizontalAlignment.Left; drv.Margin = new Thickness(0, 8, 0, 8);
+        drv.Click += async (_, _) =>
+        {
+            MainWindow.Instance.ShowBusy("Installation du pilote USB d'Apple");
+            (bool Ok, string Message) r;
+            try { r = await Task.Run(() => IPhone.InstallAppleDriver(MainWindow.Instance.BusyStatus)); } finally { MainWindow.Instance.HideBusy(); }
+            Dialog.Info(r.Ok ? "Pilote installé" : "Installation impossible", r.Message);
+        };
+        sp.Children.Add(drv);
+        sp.Children.Add(res);
+        _body.Children.Add(Ui.Card(sp, new Thickness(22)));
     }
 
     void Message(string text)

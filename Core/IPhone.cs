@@ -132,6 +132,50 @@ public static class IPhone
         return info;
     }
 
+    // ------------------------------------------------------------------ Pilote USB d'Apple
+    // Pilote officiel « Apple Mobile Device USB », distribué par le Catalogue Microsoft Update
+    public const string DriverCatalog = "https://www.catalog.update.microsoft.com/Search.aspx?q=Apple%2C%20Inc.%20USBDevice";
+    const string DriverX64 = "https://catalog.s.download.windowsupdate.com/d/msdownload/update/driver/drvs/2023/10/5fb262ea-d52d-46a7-9361-f3260ba57a1a_3e8075a4dded0a795131f82285e2f1a06525ebc2.cab";
+    const string DriverArm64 = "https://catalog.s.download.windowsupdate.com/c/msdownload/update/driver/drvs/2026/03/101d0b13-d2f1-4b3c-abc1-b44b16f4af01_9d977e0798577e7f495e26fb287eb2f070ebbd9e.cab";
+
+    /// <summary>Télécharge le pilote chez Microsoft, l'installe (pnputil) et relance le service Apple.</summary>
+    public static (bool Ok, string Message) InstallAppleDriver(Action<string> status)
+    {
+        var arm = System.Runtime.InteropServices.RuntimeInformation.OSArchitecture == System.Runtime.InteropServices.Architecture.Arm64;
+        var dir = Path.Combine(Path.GetTempPath(), "NettoyeurPC_pilote_apple");
+        try
+        {
+            if (Directory.Exists(dir)) Directory.Delete(dir, true);
+            Directory.CreateDirectory(dir);
+            var cab = Path.Combine(dir, "apple.cab");
+            status?.Invoke("Téléchargement du pilote depuis Microsoft…");
+            using (var http = new System.Net.Http.HttpClient { Timeout = TimeSpan.FromMinutes(3) })
+            {
+                var bytes = http.GetByteArrayAsync(arm ? DriverArm64 : DriverX64).GetAwaiter().GetResult();
+                File.WriteAllBytes(cab, bytes);
+            }
+            status?.Invoke("Décompression…");
+            var x = Shell.Run("expand.exe", $"-F:* \"{cab}\" \"{dir}\"", 120000);
+            var inf = Path.Combine(dir, "AppleUsb.inf");
+            if (!File.Exists(inf)) return (false, "Le pilote téléchargé est incomplet.\n" + x.Output);
+            status?.Invoke("Installation du pilote…");
+            var r = Shell.Run("pnputil.exe", $"/add-driver \"{inf}\" /install", 300000);
+            Log.Info("Pilote Apple : " + r.Output.Trim());
+            var ok = r.Code == 0 || r.Code == 3010 || r.Output.Contains("ajouté", StringComparison.OrdinalIgnoreCase) || r.Output.Contains("added", StringComparison.OrdinalIgnoreCase);
+            if (!ok) return (false, "L'installation du pilote a échoué :\n" + r.Output.Trim());
+            status?.Invoke("Redémarrage du service Apple…");
+            Shell.Run("net.exe", "stop \"Apple Mobile Device Service\"", 60000);
+            var sv = Shell.Run("net.exe", "start \"Apple Mobile Device Service\"", 60000);
+            var svcMissing = sv.Output.Contains("2185") || sv.Output.Contains("nom de service n'est pas valide", StringComparison.OrdinalIgnoreCase) || sv.Output.Contains("service name is invalid", StringComparison.OrdinalIgnoreCase);
+            History.Add(new HistoryEvent { Title = "Pilote USB d'Apple installé", Sub = "Apple Mobile Device USB (Catalogue Microsoft Update)" });
+            return (true, "Pilote installé. Débranche puis rebranche l'iPhone, déverrouillé, et clique sur Actualiser."
+                + (r.Code == 3010 ? "\n\nWindows demande un redémarrage du PC pour finir." : "")
+                + (svcMissing ? "\n\nAttention : le service « Apple Mobile Device » est absent. Installe iTunes depuis le site d'Apple (pas la version du Microsoft Store)." : "\n\nSi l'iPhone n'apparaît toujours pas, redémarre le PC."));
+        }
+        catch (Exception ex) { Log.Error("Installation du pilote Apple", ex); return (false, "Impossible d'installer le pilote : " + ex.Message); }
+        finally { try { Directory.Delete(dir, true); } catch { } }
+    }
+
     // ------------------------------------------------------------------ Applis
     public static (List<IApp> Apps, string Error) Apps(string udid)
     {

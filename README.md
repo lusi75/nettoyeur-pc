@@ -4,7 +4,7 @@ Une application Windows pour **libérer de la place et garder un PC rapide**, pe
 
 Elle s'occupe aussi de ton **téléphone** (iPhone ou Android) branché en USB.
 
-> Version actuelle : **2.3** · Windows 10 et 11 (64 bits) · interface en français
+> Version actuelle : **2.3.1** · Windows 10 et 11 (64 bits) · interface en français
 
 ---
 
@@ -111,9 +111,16 @@ Une fois par semaine, le jour de ton choix, uniquement avec les règles sûres, 
 ## Téléphone : ce qu'il faut préparer
 
 **iPhone**
-1. Installer **iTunes depuis le site d'Apple** (pas la version du Microsoft Store) : il fournit le pilote USB et le service « Apple Mobile Device ».
+1. Installer **iTunes depuis le site d'Apple**, pas la version du Microsoft Store : il fournit le pilote USB et le service « Apple Mobile Device ».
+   Téléchargement direct (Windows 64 bits) : **https://www.apple.com/itunes/download/win64**
 2. Brancher l'iPhone, le **déverrouiller** et appuyer sur **Se fier**.
-3. Si Windows ne le reconnaît pas (il apparaît comme « Périphérique USB MTP »), installer le pilote « Apple Mobile Device USB » depuis le Catalogue Microsoft Update, puis redémarrer le PC.
+3. Si Windows ne le reconnaît toujours pas (dans le Gestionnaire de périphériques, il apparaît comme « Périphérique USB MTP »), il manque le pilote USB d'Apple :
+   - **Le plus simple, depuis l'appli :** écran Téléphone → iPhone → **Installer le pilote USB d'Apple**. L'appli télécharge le pilote officiel sur le Catalogue Microsoft Update, l'installe et relance le service Apple. Débranche et rebranche ensuite l'iPhone ; redémarre le PC si besoin.
+   - **À la main :**
+     1. Télécharge le pilote, PC classiques (x64) : [Apple Mobile Device USB 538, AMD64](https://catalog.s.download.windowsupdate.com/d/msdownload/update/driver/drvs/2023/10/5fb262ea-d52d-46a7-9361-f3260ba57a1a_3e8075a4dded0a795131f82285e2f1a06525ebc2.cab). Toutes les versions sont dans le [Catalogue Microsoft Update](https://www.catalog.update.microsoft.com/Search.aspx?q=Apple%2C%20Inc.%20USBDevice) : prends la ligne **AMD64**, pas ARM64, sauf sur un PC à processeur ARM.
+     2. Ouvre le fichier `.cab` (double-clic) et copie son contenu dans un dossier.
+     3. Gestionnaire de périphériques → **Contrôleurs de bus USB** → clic droit sur le **Périphérique USB composite** qui disparaît quand tu débranches l'iPhone → **Mettre à jour le pilote** → **Parcourir mon poste de travail** → **Choisir parmi une liste** → **Disque fourni** → choisis `AppleUsb.inf` → **Apple Mobile Device USB Composite Device**.
+     4. Redémarre le PC.
 
 **Android**
 1. Paramètres → À propos du téléphone → appuyer **7 fois sur « Numéro de version »**.

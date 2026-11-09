@@ -1,0 +1,92 @@
+<Window x:Class="NettoyeurPC.UI.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Nettoyeur PC" Width="1360" Height="900" MinWidth="1040" MinHeight="680"
+        WindowStartupLocation="CenterScreen" Background="{DynamicResource Bg}"
+        FontFamily="{StaticResource Ui}" FontSize="14" Foreground="{DynamicResource Text}"
+        UseLayoutRounding="True" TextOptions.TextFormattingMode="Display">
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="236"/>
+            <ColumnDefinition Width="*"/>
+        </Grid.ColumnDefinitions>
+
+        <!-- Menu latéral -->
+        <Border Background="{DynamicResource Sidebar}" BorderBrush="{DynamicResource Line}" BorderThickness="0,0,1,0">
+            <DockPanel Margin="14,18,14,14" LastChildFill="False">
+                <StackPanel DockPanel.Dock="Top" Orientation="Horizontal" Margin="8,0,0,22">
+                    <Border Width="36" Height="36" CornerRadius="10" Background="{DynamicResource Accent}">
+                        <TextBlock Text="&#xE945;" FontFamily="{StaticResource Icons}" FontSize="18" Foreground="{DynamicResource OnAccent}" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                    </Border>
+                    <StackPanel Margin="10,0,0,0" VerticalAlignment="Center">
+                        <TextBlock Text="Nettoyeur PC" FontFamily="{StaticResource Display}" FontWeight="Bold" FontSize="16"/>
+                        <TextBlock x:Name="VersionText" Text="Version 2.0" FontSize="12" Foreground="{DynamicResource Muted}"/>
+                    </StackPanel>
+                </StackPanel>
+                <RadioButton x:Name="NavHome" DockPanel.Dock="Top" Style="{StaticResource Nav}" GroupName="nav" Tag="home" Checked="Nav_Checked">
+                    <StackPanel Orientation="Horizontal"><TextBlock Text="&#xE80F;" FontFamily="{StaticResource Icons}" Width="28" VerticalAlignment="Center"/><TextBlock Text="Accueil"/></StackPanel>
+                </RadioButton>
+                <RadioButton x:Name="NavClean" DockPanel.Dock="Top" Style="{StaticResource Nav}" GroupName="nav" Tag="clean" Checked="Nav_Checked">
+                    <StackPanel Orientation="Horizontal"><TextBlock Text="&#xE74D;" FontFamily="{StaticResource Icons}" Width="28" VerticalAlignment="Center"/><TextBlock Text="Nettoyage"/></StackPanel>
+                </RadioButton>
+                <RadioButton x:Name="NavStorage" DockPanel.Dock="Top" Style="{StaticResource Nav}" GroupName="nav" Tag="storage" Checked="Nav_Checked">
+                    <StackPanel Orientation="Horizontal"><TextBlock Text="&#xEDA2;" FontFamily="{StaticResource Icons}" Width="28" VerticalAlignment="Center"/><TextBlock Text="Stockage"/></StackPanel>
+                </RadioButton>
+                <RadioButton x:Name="NavApps" DockPanel.Dock="Top" Style="{StaticResource Nav}" GroupName="nav" Tag="apps" Checked="Nav_Checked">
+                    <StackPanel Orientation="Horizontal"><TextBlock Text="&#xE71D;" FontFamily="{StaticResource Icons}" Width="28" VerticalAlignment="Center"/><TextBlock Text="Applications"/></StackPanel>
+                </RadioButton>
+                <RadioButton x:Name="NavStartup" DockPanel.Dock="Top" Style="{StaticResource Nav}" GroupName="nav" Tag="startup" Checked="Nav_Checked">
+                    <StackPanel Orientation="Horizontal"><TextBlock Text="&#xE7E8;" FontFamily="{StaticResource Icons}" Width="28" VerticalAlignment="Center"/><TextBlock Text="Démarrage"/></StackPanel>
+                </RadioButton>
+                <RadioButton x:Name="NavRegistry" DockPanel.Dock="Top" Style="{StaticResource Nav}" GroupName="nav" Tag="registry" Checked="Nav_Checked">
+                    <StackPanel Orientation="Horizontal"><TextBlock Text="&#xE943;" FontFamily="{StaticResource Icons}" Width="28" VerticalAlignment="Center"/><TextBlock Text="Registre"/></StackPanel>
+                </RadioButton>
+                <RadioButton x:Name="NavPhone" DockPanel.Dock="Top" Style="{StaticResource Nav}" GroupName="nav" Tag="phone" Checked="Nav_Checked">
+                    <StackPanel Orientation="Horizontal"><TextBlock Text="&#xE8EA;" FontFamily="{StaticResource Icons}" Width="28" VerticalAlignment="Center"/><TextBlock Text="Téléphone"/></StackPanel>
+                </RadioButton>
+                <RadioButton x:Name="NavHistory" DockPanel.Dock="Top" Style="{StaticResource Nav}" GroupName="nav" Tag="history" Checked="Nav_Checked">
+                    <StackPanel Orientation="Horizontal"><TextBlock Text="&#xE81C;" FontFamily="{StaticResource Icons}" Width="28" VerticalAlignment="Center"/><TextBlock Text="Historique"/></StackPanel>
+                </RadioButton>
+
+                <RadioButton x:Name="NavSettings" DockPanel.Dock="Bottom" Style="{StaticResource Nav}" GroupName="nav" Tag="settings" Checked="Nav_Checked">
+                    <StackPanel Orientation="Horizontal"><TextBlock Text="&#xE713;" FontFamily="{StaticResource Icons}" Width="28" VerticalAlignment="Center"/><TextBlock Text="Paramètres"/></StackPanel>
+                </RadioButton>
+                <Border x:Name="GameCard" DockPanel.Dock="Bottom" Margin="4,0,4,10" Padding="12,10" CornerRadius="10" Background="#171B23" BorderBrush="{DynamicResource Line}" BorderThickness="1" ToolTip="Performances maximales, nettoyage automatique en pause, applis choisies fermées. Tout revient comme avant quand tu le désactives.">
+                    <Grid>
+                        <Grid.ColumnDefinitions><ColumnDefinition Width="Auto"/><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
+                        <TextBlock Text="&#xE7FC;" FontFamily="{StaticResource Icons}" FontSize="18" VerticalAlignment="Center" Foreground="{DynamicResource Accent}"/>
+                        <StackPanel Grid.Column="1" Margin="10,0,8,0" VerticalAlignment="Center">
+                            <TextBlock Text="Mode jeu" FontWeight="SemiBold" FontSize="13"/>
+                            <TextBlock x:Name="GameText" Text="Désactivé" FontSize="12" Foreground="{DynamicResource Muted}" TextTrimming="CharacterEllipsis"/>
+                        </StackPanel>
+                        <ToggleButton x:Name="GameSwitch" Grid.Column="2" Style="{StaticResource Switch}" VerticalAlignment="Center" AutomationProperties.Name="Mode jeu" Checked="GameSwitch_Changed" Unchecked="GameSwitch_Changed"/>
+                    </Grid>
+                </Border>
+                <Border DockPanel.Dock="Bottom" Margin="4,0,4,10" Padding="12" CornerRadius="10" Background="#171B23" BorderBrush="{DynamicResource Line}" BorderThickness="1">
+                    <StackPanel>
+                        <TextBlock Text="Protection" FontSize="12" Foreground="{DynamicResource Muted}"/>
+                        <StackPanel Orientation="Horizontal" Margin="0,6,0,0">
+                            <Ellipse Width="8" Height="8" Fill="{DynamicResource Accent}" VerticalAlignment="Center"/>
+                            <TextBlock x:Name="ProtectionText" Text="Annulation possible 7 jours" FontSize="13" Margin="8,0,0,0" TextWrapping="Wrap"/>
+                        </StackPanel>
+                    </StackPanel>
+                </Border>
+            </DockPanel>
+        </Border>
+
+        <!-- Contenu -->
+        <ContentControl x:Name="Host" Grid.Column="1" Focusable="False"/>
+
+        <!-- Voile d'attente -->
+        <Grid x:Name="Busy" Grid.ColumnSpan="2" Background="#CC0F1115" Visibility="Collapsed">
+            <Border Width="460" Padding="28" CornerRadius="16" Background="{DynamicResource Surface}" BorderBrush="{DynamicResource Line2}" BorderThickness="1" VerticalAlignment="Center">
+                <StackPanel>
+                    <TextBlock x:Name="BusyTitle" Text="Un instant…" Style="{StaticResource H2}"/>
+                    <TextBlock x:Name="BusyText" Text="" Style="{StaticResource Body}" Margin="0,10,0,16" TextTrimming="CharacterEllipsis" TextWrapping="NoWrap"/>
+                    <ProgressBar Style="{StaticResource Bar}" IsIndeterminate="True" Height="6"/>
+                    <Button x:Name="BusyCancel" Style="{StaticResource Ghost}" Content="Arrêter" HorizontalAlignment="Right" Margin="0,18,0,0" Visibility="Collapsed" Click="BusyCancel_Click"/>
+                </StackPanel>
+            </Border>
+        </Grid>
+    </Grid>
+</Window>

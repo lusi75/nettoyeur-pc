@@ -1,0 +1,33 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net9.0-windows</TargetFramework>
+    <UseWPF>true</UseWPF>
+    <EnableWindowsTargeting>true</EnableWindowsTargeting>
+    <Nullable>disable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <LangVersion>latest</LangVersion>
+    <RootNamespace>NettoyeurPC</RootNamespace>
+    <AssemblyName>NettoyeurPC</AssemblyName>
+    <ApplicationManifest>app.manifest</ApplicationManifest>
+    <ApplicationIcon>Assets\app.ico</ApplicationIcon>
+    <Version>2.3.0</Version>
+    <Product>Nettoyeur PC</Product>
+    <Company>Nettoyeur PC</Company>
+    <Description>Nettoyeur PC 2.0</Description>
+    <Copyright>2026</Copyright>
+    <InvariantGlobalization>false</InvariantGlobalization>
+    <SatelliteResourceLanguages>fr</SatelliteResourceLanguages>
+    <TieredPGO>true</TieredPGO>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="System.Management" Version="9.0.0" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Assets\app.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Assets\outils-iphone.zip" LogicalName="NettoyeurPC.outils-iphone.zip" />
+    <EmbeddedResource Include="Assets\outils-android.zip" LogicalName="NettoyeurPC.outils-android.zip" />
+  </ItemGroup>
+</Project>

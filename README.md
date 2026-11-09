@@ -4,7 +4,7 @@ Une application Windows pour **libérer de la place et garder un PC rapide**, pe
 
 Elle s'occupe aussi de ton **téléphone** (iPhone ou Android) branché en USB.
 
-> Version actuelle : **2.3.1** · Windows 10 et 11 (64 bits) · interface en français
+> Version actuelle : **2.3.2** · Windows 10 et 11 (64 bits) · interface en français
 
 ---
 
@@ -126,6 +126,13 @@ Une fois par semaine, le jour de ton choix, uniquement avec les règles sûres, 
 1. Paramètres → À propos du téléphone → appuyer **7 fois sur « Numéro de version »**.
 2. Paramètres → Options pour les développeurs → activer **Débogage USB**.
 3. Brancher le téléphone et accepter **« Autoriser le débogage USB »**.
+4. Si le téléphone n'apparaît pas, il manque peut-être le **pilote USB** de la marque. Windows 10 et 11 l'installent souvent seuls, mais sinon :
+   - **Samsung** : https://developer.samsung.com/galaxy/others/android-usb-driver-for-windows
+   - **Google Pixel** : https://developer.android.com/studio/run/win-usb
+   - **Autres marques** (Xiaomi, Motorola, Huawei, Sony, Asus…) : https://developer.android.com/studio/run/oem-usb
+   - **OnePlus, Oppo** et marques absentes de cette liste : rubrique « Support » ou « Téléchargements » du site du fabricant.
+
+   Ces liens sont aussi proposés dans l'appli (écran Téléphone → Android) quand aucun téléphone n'est détecté.
 
 ---
 

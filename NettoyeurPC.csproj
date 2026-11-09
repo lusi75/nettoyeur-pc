@@ -11,7 +11,7 @@
     <AssemblyName>NettoyeurPC</AssemblyName>
     <ApplicationManifest>app.manifest</ApplicationManifest>
     <ApplicationIcon>Assets\app.ico</ApplicationIcon>
-    <Version>2.3.1</Version>
+    <Version>2.3.2</Version>
     <Product>Nettoyeur PC</Product>
     <Company>Nettoyeur PC</Company>
     <Description>Nettoyeur PC 2.0</Description>

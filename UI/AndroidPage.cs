@@ -34,9 +34,9 @@ public class AndroidPage : UserControl
             if (ready == null)
             {
                 Sub.Text = devs.Count == 0 ? "Aucun téléphone Android détecté." : "Téléphone détecté, en attente d'autorisation.";
-                Message(devs.Any(d => d.State == "unauthorized")
-                    ? "Sur le téléphone, une fenêtre « Autoriser le débogage USB ? » est affichée : coche « Toujours autoriser depuis cet ordinateur » puis appuie sur Autoriser. Clique ensuite sur Actualiser."
-                    : Setup());
+                if (devs.Any(d => d.State == "unauthorized"))
+                    Message("Sur le téléphone, une fenêtre « Autoriser le débogage USB ? » est affichée : coche « Toujours autoriser depuis cet ordinateur » puis appuie sur Autoriser. Clique ensuite sur Actualiser.");
+                else NoDevice();
                 return;
             }
             await Task.Run(() => Android.Fill(ready));
@@ -55,6 +55,30 @@ public class AndroidPage : UserControl
         "3.  Branche le téléphone en USB, déverrouille-le et accepte « Autoriser le débogage USB » (coche « Toujours autoriser »).\n" +
         "4.  Clique sur Actualiser.\n\n" +
         "Tu pourras désactiver le débogage USB une fois terminé. Si Windows ne voit pas le téléphone, choisis « Transfert de fichiers » dans la notification USB.";
+
+    void NoDevice()
+    {
+        _body.Children.Clear();
+        var sp = new StackPanel();
+        sp.Children.Add(Wrap(Setup(), "Body"));
+        sp.Children.Add(Ui.Text("Toujours rien ? Il manque peut-être le pilote USB de la marque", "H3").With(t => t.Margin = new Thickness(0, 18, 0, 6)));
+        sp.Children.Add(Wrap("Windows 10 et 11 l'installent souvent tout seuls. Sinon, télécharge-le chez le fabricant, installe-le puis rebranche le téléphone :", "Small", 13));
+        var links = new WrapPanel { Margin = new Thickness(0, 10, 0, 0) };
+        foreach (var (label, url) in new[]
+        {
+            ("Samsung", "https://developer.samsung.com/galaxy/others/android-usb-driver-for-windows"),
+            ("Google Pixel", "https://developer.android.com/studio/run/win-usb"),
+            ("Autres marques (Xiaomi, Motorola…)", "https://developer.android.com/studio/run/oem-usb"),
+        })
+        {
+            var b = Ui.Btn(label, "Ghost", (_, _) => Shell.OpenUrlOrFile(url), "\uE896");
+            b.Height = 36; b.Margin = new Thickness(0, 0, 10, 10);
+            links.Children.Add(b);
+        }
+        sp.Children.Add(links);
+        sp.Children.Add(Wrap("OnePlus, Oppo et marques absentes : rubrique « Support » ou « Téléchargements » du site du fabricant.", "Small", 12));
+        _body.Children.Add(Ui.Card(sp, new Thickness(22)));
+    }
 
     void Message(string text)
     {
